@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block content %}
+<form method="post" action="{% url 'todo_create' %}">
+    {% csrf_token %}
+    <input type="text" name="title" placeholder="New TODO" required>
+    <input type="date" name="due_date">
+    <button type="submit">Add</button>
+</form>
+
+<ul>
+    {% for todo in todos %}
+        <li>
+            {% if todo.completed %}<s>{% endif %}
+            {{ todo.title }} {% if todo.due_date %} (due: {{ todo.due_date }}){% endif %}
+            {% if todo.completed %}</s>{% endif %}
+
+            <a href="{% url 'todo_toggle' todo.pk %}">
+                {% if todo.completed %}Mark as pending{% else %}Mark as done{% endif %}
+            </a>
+            <a href="{% url 'todo_delete' todo.pk %}">Delete</a>
+        </li>
+    {% empty %}
+        <li>No TODOs yet</li>
+    {% endfor %}
+</ul>
+{% endblock %}
