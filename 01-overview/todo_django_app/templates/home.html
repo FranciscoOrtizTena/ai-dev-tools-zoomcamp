@@ -1,27 +1,43 @@
 {% extends "base.html" %}
 
 {% block content %}
-<form method="post" action="{% url 'todo_create' %}">
+<h2 style="margin: 0 0 12px;">Pre-Christmas To-Do</h2>
+<p class="muted" style="margin: 0 0 18px;">Add tasks, set a date, and mark them done before the feast.</p>
+
+<form class="form-grid" method="post" action="{% url 'todo_create' %}">
     {% csrf_token %}
-    <input type="text" name="title" placeholder="New TODO" required>
-    <input type="date" name="due_date">
-    <button type="submit">Add</button>
+    <input class="input" type="text" name="title" placeholder="Buy gifts, decorate the tree..." required>
+    <input class="input" type="date" name="due_date">
+    <button class="btn btn-primary" type="submit">Add</button>
 </form>
 
-<ul>
+<ul class="todo-list">
     {% for todo in todos %}
-        <li>
-            {% if todo.completed %}<s>{% endif %}
-            {{ todo.title }} {% if todo.due_date %} (due: {{ todo.due_date }}){% endif %}
-            {% if todo.completed %}</s>{% endif %}
-
-            <a href="{% url 'todo_toggle' todo.pk %}">
-                {% if todo.completed %}Mark as pending{% else %}Mark as done{% endif %}
-            </a>
-            <a href="{% url 'todo_delete' todo.pk %}">Delete</a>
+        <li class="todo-item">
+            <div>
+                <div class="todo-title">
+                    {% if todo.completed %}<s>{% endif %}
+                    {{ todo.title }}
+                    {% if todo.completed %}</s>{% endif %}
+                </div>
+                {% if todo.due_date %}
+                    <div class="muted">Due: {{ todo.due_date }}</div>
+                {% endif %}
+                <div style="margin-top: 8px;">
+                    <span class="status-pill {% if todo.completed %}done{% endif %}">
+                        {% if todo.completed %}Done{% else %}Pending{% endif %}
+                    </span>
+                </div>
+            </div>
+            <div class="actions">
+                <a class="link-btn" href="{% url 'todo_toggle' todo.pk %}">
+                    {% if todo.completed %}Mark pending{% else %}Mark done{% endif %}
+                </a>
+                <a class="link-btn" href="{% url 'todo_delete' todo.pk %}">Delete</a>
+            </div>
         </li>
     {% empty %}
-        <li>No TODOs yet</li>
+        <li class="empty">No tasks yet. Perfect time to plan the Christmas dinner.</li>
     {% endfor %}
 </ul>
 {% endblock %}

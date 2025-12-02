@@ -2,11 +2,262 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TODO App</title>
+    <style>
+        :root {
+            --pine: #0f3d2e;
+            --holly: #c1121f;
+            --berry: #c72c41;
+            --gold: #f4a261;
+            --cream: #fdf4e3;
+            --ice: rgba(255, 255, 255, 0.14);
+            --shadow: rgba(0, 0, 0, 0.12);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Georgia", "Times New Roman", serif;
+            color: var(--pine);
+            background:
+                radial-gradient(120% 120% at 30% 20%, rgba(255, 255, 255, 0.5), transparent 60%),
+                radial-gradient(120% 140% at 80% 0%, rgba(255, 255, 255, 0.35), transparent 50%),
+                linear-gradient(160deg, #0b2f24 0%, #124734 40%, #0b2f24 100%);
+            position: relative;
+            overflow-x: hidden;
+            padding: 24px;
+        }
+
+        body::before,
+        body::after {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            background-image:
+                radial-gradient(2px 2px at 20% 30%, rgba(255, 255, 255, 0.7), transparent 50%),
+                radial-gradient(2px 2px at 70% 20%, rgba(255, 255, 255, 0.6), transparent 50%),
+                radial-gradient(2px 2px at 40% 70%, rgba(255, 255, 255, 0.65), transparent 50%),
+                radial-gradient(3px 3px at 90% 60%, rgba(255, 255, 255, 0.5), transparent 50%);
+            animation: snowfall 18s linear infinite;
+            opacity: 0.85;
+        }
+
+        body::after {
+            animation-duration: 26s;
+            animation-direction: reverse;
+            filter: blur(0.4px);
+        }
+
+        @keyframes snowfall {
+            0% { transform: translateY(-10px); }
+            100% { transform: translateY(30px); }
+        }
+
+        .page {
+            max-width: 960px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, rgba(193, 18, 31, 0.9), rgba(247, 199, 87, 0.95));
+            color: #301010;
+            border-radius: 18px;
+            padding: 22px 26px;
+            box-shadow: 0 16px 50px var(--shadow);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .hero-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 14px;
+            background: linear-gradient(145deg, #e8d6a7, #f7c757);
+            display: grid;
+            place-items: center;
+            font-size: 32px;
+            box-shadow: inset 0 4px 0 rgba(255, 255, 255, 0.6), 0 10px 30px var(--shadow);
+        }
+
+        .hero h1 {
+            margin: 0;
+            font-size: 28px;
+            letter-spacing: 0.3px;
+        }
+
+        .hero p {
+            margin: 4px 0 0;
+            font-size: 15px;
+            color: #4f2b2b;
+        }
+
+        .card {
+            background: var(--cream);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 12px 35px var(--shadow);
+            margin-top: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.35);
+        }
+
+        a {
+            color: var(--holly);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        a:hover { color: var(--berry); }
+
+        button {
+            cursor: pointer;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 200px auto;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .input {
+            width: 100%;
+            padding: 11px 12px;
+            border-radius: 10px;
+            border: 1px solid rgba(12, 61, 46, 0.2);
+            background: rgba(255, 255, 255, 0.9);
+            font-size: 15px;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.04);
+        }
+
+        .input:focus {
+            outline: 2px solid rgba(193, 18, 31, 0.25);
+            border-color: var(--holly);
+        }
+
+        .btn {
+            border: none;
+            padding: 11px 18px;
+            border-radius: 10px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            box-shadow: 0 10px 25px var(--shadow);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--holly), #e63946);
+            color: #fff7e6;
+        }
+
+        .btn-primary:hover { filter: brightness(1.05); }
+
+        .link-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 12px;
+            border-radius: 10px;
+            background: rgba(15, 61, 46, 0.08);
+            color: var(--pine);
+            font-weight: 700;
+            border: 1px solid rgba(15, 61, 46, 0.12);
+        }
+
+        .link-btn:hover {
+            background: rgba(193, 18, 31, 0.12);
+            color: var(--holly);
+        }
+
+        .todo-list {
+            list-style: none;
+            padding: 0;
+            margin: 22px 0 0;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .todo-item {
+            background: rgba(255, 255, 255, 0.88);
+            border: 1px solid rgba(15, 61, 46, 0.12);
+            border-radius: 12px;
+            padding: 14px 16px;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 12px;
+            align-items: center;
+            box-shadow: 0 8px 18px var(--shadow);
+        }
+
+        .todo-title {
+            font-weight: 700;
+            color: var(--pine);
+        }
+
+        .muted { color: #3f5c50; font-size: 14px; }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: rgba(193, 18, 31, 0.1);
+            color: var(--holly);
+            font-weight: 700;
+            font-size: 13px;
+            letter-spacing: 0.2px;
+        }
+
+        .status-pill.done {
+            background: rgba(26, 128, 76, 0.1);
+            color: #1a804c;
+        }
+
+        .actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 20px 0 8px;
+            color: #2b4a3d;
+        }
+
+        @media (max-width: 720px) {
+            body { padding: 18px 14px; }
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            .actions {
+                justify-content: flex-start;
+            }
+        }
+    </style>
 </head>
 <body>
-    <h1>TODO App</h1>
-    <hr>
-    {% block content %}{% endblock %}
+    <div class="page">
+        <header class="hero">
+            <div class="hero-icon">XMAS</div>
+            <div>
+                <h1>Christmas Checklist</h1>
+                <p>Keep every task wrapped up before Santa arrives.</p>
+            </div>
+        </header>
+
+        <main class="card">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
 </body>
 </html>
