@@ -1,0 +1,7 @@
+__pycache__/
+.pytest_cache/
+.venv/
+*.db
+tests/
+tests_integration/
+snake_ops.db

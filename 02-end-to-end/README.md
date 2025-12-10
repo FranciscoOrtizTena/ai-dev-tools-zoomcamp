@@ -21,3 +21,18 @@ Extra scripts:
 - `npm run dev:frontend` – frontend only.
 
 If your backend runs elsewhere, set `VITE_API_BASE_URL` before `npm run dev:frontend` (or in your env) so the UI points to the correct API.
+
+## Docker Compose stack
+
+Run everything (frontend via Nginx, FastAPI backend, and Postgres) with one command:
+
+```bash
+cd 02-end-to-end
+docker compose up --build
+```
+
+- Frontend: http://localhost:5173 (proxies `/api/*` to the backend).
+- Backend: http://localhost:8000
+- Postgres: exposed on `localhost:5432` (user/password/db: `snake_ops`).
+
+If you want to point the built frontend at a different API URL, rebuild with `--build-arg API_BASE_URL=https://your-api.example.com` on the frontend service.
