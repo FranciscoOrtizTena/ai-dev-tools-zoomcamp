@@ -1,4 +1,4 @@
-import { advanceState, createInitialState, sanitizeDirection } from './engine';
+import { advanceState, createInitialState, EngineState, sanitizeDirection } from './engine';
 
 describe('Snake engine', () => {
   it('generates initial state with snake and food', () => {
@@ -10,7 +10,7 @@ describe('Snake engine', () => {
 
   it('wraps around the board in pass-through mode', () => {
     const initial = createInitialState({ mode: 'pass-through', gridSize: 5 });
-    const state = {
+    const state: EngineState = {
       ...initial,
       snake: [
         { x: 4, y: 2 },
@@ -27,7 +27,7 @@ describe('Snake engine', () => {
 
   it('ends the game on wall collision in walls mode', () => {
     const initial = createInitialState({ mode: 'walls', gridSize: 5 });
-    const state = {
+    const state: EngineState = {
       ...initial,
       snake: [
         { x: 0, y: 0 },
@@ -41,7 +41,7 @@ describe('Snake engine', () => {
 
   it('increases score and grows when food is eaten', () => {
     const initial = createInitialState({ mode: 'walls', gridSize: 8 });
-    const state = {
+    const state: EngineState = {
       ...initial,
       snake: [
         { x: 3, y: 3 },
