@@ -64,6 +64,13 @@ def test_sse_stream_emits_events():
       if line.startswith("data: "):
         event_payload = json.loads(line.replace("data: ", "", 1).strip())
         break
-    assert event_payload is not None
-    assert isinstance(event_payload, list)
-    assert event_payload and "player" in event_payload[0]
+  assert event_payload is not None
+  assert isinstance(event_payload, list)
+  assert event_payload and "player" in event_payload[0]
+
+
+def test_leaderboard_preflight_allowed():
+  response = client.options("/leaderboard")
+  assert response.status_code == 200
+  allow_methods = response.headers.get("access-control-allow-methods", "").lower()
+  assert "get" in allow_methods

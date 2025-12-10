@@ -4,12 +4,20 @@ from typing import AsyncIterator
 
 from fastapi import FastAPI, status
 from fastapi.responses import JSONResponse, Response, StreamingResponse
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.db import MockDatabase
 from app.schemas import AuthRequest, ErrorResponse, LeaderboardEntry, ScoreRequest, Session, SpectatorSnapshot
 from app.spectator import SpectatorEngine
 
 app = FastAPI(title="Snake Ops API", version="1.0.0")
+
+app.add_middleware(
+  CORSMiddleware,
+  allow_origins=["*"],
+  allow_methods=["*"],
+  allow_headers=["*"],
+)
 
 db = MockDatabase()
 spectator_engine = SpectatorEngine()
