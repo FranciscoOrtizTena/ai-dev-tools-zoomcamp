@@ -1,0 +1,227 @@
+openapi: 3.1.0
+info:
+  title: Snake Ops API
+  version: 1.0.0
+servers:
+  - url: https://api.example.com
+paths:
+  /auth/signup:
+    post:
+      summary: Create a new user
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [username, password]
+              properties:
+                username:
+                  type: string
+                  minLength: 1
+                  example: nova
+                password:
+                  type: string
+                  minLength: 1
+                  example: secret
+      responses:
+        "201":
+          description: Account created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Session"
+        "409":
+          description: Username already exists
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /auth/login:
+    post:
+      summary: Log in an existing user
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [username, password]
+              properties:
+                username:
+                  type: string
+                  minLength: 1
+                password:
+                  type: string
+                  minLength: 1
+      responses:
+        "200":
+          description: Logged in
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Session"
+        "401":
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /leaderboard:
+    get:
+      summary: Get leaderboard entries
+      tags: [Leaderboard]
+      responses:
+        "200":
+          description: Ordered by bestScore descending
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/LeaderboardEntry"
+  /scores:
+    post:
+      summary: Record a finished run for a user
+      tags: [Scores]
+      description: Frontend currently posts username, score, and mode directly.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [username, score, mode]
+              properties:
+                username:
+                  type: string
+                  minLength: 1
+                score:
+                  type: integer
+                  minimum: 0
+                mode:
+                  $ref: "#/components/schemas/GameMode"
+      responses:
+        "204":
+          description: Score recorded
+        "404":
+          description: Player not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /spectator/snapshots:
+    get:
+      summary: Fetch current spectator snapshots (manual refresh)
+      tags: [Spectator]
+      responses:
+        "200":
+          description: Latest simulated games
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SpectatorSnapshot"
+  /spectator/stream:
+    get:
+      summary: Server-sent events stream of spectator snapshots
+      tags: [Spectator]
+      description: Emits an initial snapshot array, then updates roughly every 1.5s. Event payloads are JSON arrays of `SpectatorSnapshot`.
+      responses:
+        "200":
+          description: Live updates
+          content:
+            text/event-stream:
+              schema:
+                type: string
+        "503":
+          description: Stream unavailable
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+components:
+  schemas:
+    GameMode:
+      type: string
+      enum: ["pass-through", "walls"]
+    Point:
+      type: object
+      required: [x, y]
+      properties:
+        x:
+          type: integer
+        y:
+          type: integer
+    UserProfile:
+      type: object
+      required: [id, username]
+      properties:
+        id:
+          type: string
+        username:
+          type: string
+    Session:
+      type: object
+      required: [token, user]
+      properties:
+        token:
+          type: string
+        user:
+          $ref: "#/components/schemas/UserProfile"
+    LeaderboardEntry:
+      type: object
+      required: [player, bestScore, totalRuns, modeBreakdown]
+      properties:
+        player:
+          type: string
+        bestScore:
+          type: integer
+          minimum: 0
+        totalRuns:
+          type: integer
+          minimum: 0
+        modeBreakdown:
+          type: object
+          required: ["pass-through", "walls"]
+          properties:
+            pass-through:
+              type: integer
+              minimum: 0
+            walls:
+              type: integer
+              minimum: 0
+    SpectatorSnapshot:
+      type: object
+      required: [id, player, mode, snake, food, score, gridSize, updatedAt]
+      properties:
+        id:
+          type: string
+        player:
+          type: string
+        mode:
+          $ref: "#/components/schemas/GameMode"
+        snake:
+          type: array
+          items:
+            $ref: "#/components/schemas/Point"
+        food:
+          $ref: "#/components/schemas/Point"
+        score:
+          type: integer
+          minimum: 0
+        gridSize:
+          type: integer
+          minimum: 1
+        updatedAt:
+          type: integer
+          description: Unix epoch milliseconds
+    ErrorResponse:
+      type: object
+      required: [message]
+      properties:
+        message:
+          type: string
