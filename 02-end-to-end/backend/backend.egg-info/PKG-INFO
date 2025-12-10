@@ -1,0 +1,42 @@
+Metadata-Version: 2.4
+Name: backend
+Version: 0.1.0
+Summary: Add your description here
+Requires-Python: >=3.12
+Description-Content-Type: text/markdown
+Requires-Dist: fastapi>=0.124.2
+Requires-Dist: httpx>=0.28.1
+Requires-Dist: pytest>=9.0.2
+Requires-Dist: sqlalchemy>=2.0.36
+Requires-Dist: uvicorn>=0.38.0
+Requires-Dist: psycopg[binary]>=3.2.3
+
+## Snake Ops FastAPI backend
+
+Run locally:
+
+```bash
+uv run uvicorn app.main:app --reload
+```
+
+Run tests:
+
+```bash
+uv run pytest
+```
+
+Integration tests (SQLite-backed end-to-end):
+
+```bash
+uv run pytest tests_integration
+```
+
+### Database
+
+- Default database is SQLite stored at `backend/snake_ops.db`.
+- Override with Postgres (or any SQLAlchemy URL) via `DATABASE_URL`, e.g.:
+
+```bash
+export DATABASE_URL="postgresql+psycopg://user:pass@localhost:5432/snake_ops"
+uv run uvicorn app.main:app --reload
+```
