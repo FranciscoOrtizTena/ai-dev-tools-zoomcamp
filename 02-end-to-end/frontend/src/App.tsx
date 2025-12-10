@@ -4,7 +4,7 @@ import AuthPanel from './components/AuthPanel';
 import Leaderboard from './components/Leaderboard';
 import SpectatorPanel from './components/SpectatorPanel';
 import { GameMode, LeaderboardEntry, Session } from './types';
-import { mockApi } from './services/mockApi';
+import { apiClient } from './services/apiClient';
 import './App.css';
 
 const App = () => {
@@ -17,7 +17,7 @@ const App = () => {
     setLeaderboardLoading(true);
     setLeaderboardError(null);
     try {
-      const entries = await mockApi.fetchLeaderboard();
+      const entries = await apiClient.fetchLeaderboard();
       setLeaderboard(entries);
     } catch (error) {
       setLeaderboardError(error instanceof Error ? error.message : 'Failed to load leaderboard');
@@ -36,7 +36,7 @@ const App = () => {
         return;
       }
       try {
-        await mockApi.recordScore({ username: session.user.username, score, mode });
+        await apiClient.recordScore({ username: session.user.username, score, mode, token: session.token });
         await refreshLeaderboard();
       } catch (error) {
         console.error('Failed to record score', error);
@@ -50,20 +50,20 @@ const App = () => {
     if (!trimmed) {
       throw new Error('Username is required');
     }
-    const nextSession = await mockApi.login(trimmed, password);
+    const nextSession = await apiClient.login(trimmed, password);
     setSession(nextSession);
   }, []);
 
   const signUp = useCallback(
     async (username: string, password: string) => {
-      const trimmed = username.trim();
-      if (!trimmed) {
-        throw new Error('Username is required');
-      }
-      const nextSession = await mockApi.signUp(trimmed, password);
-      setSession(nextSession);
-      await refreshLeaderboard();
-    },
+    const trimmed = username.trim();
+    if (!trimmed) {
+      throw new Error('Username is required');
+    }
+    const nextSession = await apiClient.signUp(trimmed, password);
+    setSession(nextSession);
+    await refreshLeaderboard();
+  },
     [refreshLeaderboard]
   );
 

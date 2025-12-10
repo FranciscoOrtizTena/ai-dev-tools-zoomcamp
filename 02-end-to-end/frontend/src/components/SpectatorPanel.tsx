@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { mockApi } from '../services/mockApi';
+import { apiClient } from '../services/apiClient';
 import { SpectatorSnapshot } from '../types';
 
 const SpectatorPanel = () => {
@@ -8,7 +8,13 @@ const SpectatorPanel = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const unsubscribe = mockApi.subscribeToSpectatorFeed(setGames);
+    const unsubscribe = apiClient.subscribeToSpectatorStream(
+      (snapshots) => {
+        setGames(snapshots);
+        setError(null);
+      },
+      (message) => setError(message)
+    );
     return unsubscribe;
   }, []);
 
@@ -16,7 +22,7 @@ const SpectatorPanel = () => {
     setIsSyncing(true);
     setError(null);
     try {
-      const latest = await mockApi.fetchSpectatorSnapshots();
+      const latest = await apiClient.fetchSpectatorSnapshots();
       setGames(latest);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to sync');

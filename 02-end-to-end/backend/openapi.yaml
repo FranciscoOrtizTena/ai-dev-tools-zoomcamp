@@ -130,6 +130,14 @@ paths:
       summary: Server-sent events stream of spectator snapshots
       tags: [Spectator]
       description: Emits an initial snapshot array, then updates roughly every 1.5s. Event payloads are JSON arrays of `SpectatorSnapshot`.
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            minimum: 1
+          required: false
+          description: Number of events to emit before closing the stream. When omitted, the stream stays open.
       responses:
         "200":
           description: Live updates
