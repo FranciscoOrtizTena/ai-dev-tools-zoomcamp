@@ -1,16 +1,26 @@
 import asyncio
 import json
-from typing import AsyncIterator
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, status
-from fastapi.responses import JSONResponse, Response, StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse, Response, StreamingResponse
 
-from app.db import MockDatabase
+from app.db import db as database
 from app.schemas import AuthRequest, ErrorResponse, LeaderboardEntry, ScoreRequest, Session, SpectatorSnapshot
 from app.spectator import SpectatorEngine
 
-app = FastAPI(title="Snake Ops API", version="1.0.0")
+spectator_engine = SpectatorEngine()
+db = database
+
+
+@asynccontextmanager
+async def lifespan(_app):
+  database.init_db()
+  yield
+
+
+app = FastAPI(title="Snake Ops API", version="1.0.0", lifespan=lifespan)
 
 app.add_middleware(
   CORSMiddleware,
@@ -18,9 +28,6 @@ app.add_middleware(
   allow_methods=["*"],
   allow_headers=["*"],
 )
-
-db = MockDatabase()
-spectator_engine = SpectatorEngine()
 
 
 @app.post(
@@ -31,7 +38,7 @@ spectator_engine = SpectatorEngine()
 )
 async def sign_up(payload: AuthRequest):
   try:
-    return db.sign_up(payload.username, payload.password)
+    return database.sign_up(payload.username, payload.password)
   except ValueError as exc:
     return JSONResponse(status_code=status.HTTP_409_CONFLICT, content={"message": str(exc)})
 
@@ -44,14 +51,26 @@ async def sign_up(payload: AuthRequest):
 )
 async def login(payload: AuthRequest):
   try:
-    return db.login(payload.username, payload.password)
+    return database.login(payload.username, payload.password)
   except ValueError as exc:
     return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={"message": str(exc)})
 
 
 @app.get("/leaderboard", response_model=list[LeaderboardEntry])
 async def leaderboard():
-  return db.leaderboard()
+  return database.leaderboard()
+
+
+@app.options("/leaderboard")
+async def leaderboard_options():
+  return Response(
+    status_code=status.HTTP_200_OK,
+    headers={
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET,OPTIONS",
+      "Access-Control-Allow-Headers": "*",
+    },
+  )
 
 
 @app.post(
@@ -61,7 +80,7 @@ async def leaderboard():
 )
 async def record_score(payload: ScoreRequest):
   try:
-    db.record_score(payload.username, payload.score, payload.mode)
+    database.record_score(payload.username, payload.score, payload.mode)
   except KeyError as exc:
     return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content={"message": str(exc)})
   return Response(status_code=status.HTTP_204_NO_CONTENT)
