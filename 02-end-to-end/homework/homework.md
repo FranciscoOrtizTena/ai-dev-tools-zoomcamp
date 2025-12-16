@@ -169,6 +169,10 @@ For security reasons, we don't want to execute code directly on the server. Inst
 
 Which library did AI use for compiling Python to WASM?
 
+```text
+Pyodide
+```
+
 
 ## Question 6: Containerization
 
