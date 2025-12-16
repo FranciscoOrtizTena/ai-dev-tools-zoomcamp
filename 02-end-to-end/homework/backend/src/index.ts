@@ -34,7 +34,7 @@ const defaultState: RoomState = {
 };
 
 app.get("/", (_req, res) => {
-  res.redirect("/docs");
+  res.sendFile(path.join(distPath, "index.html"));
 });
 
 app.get("/api/health", (_req, res) => {
