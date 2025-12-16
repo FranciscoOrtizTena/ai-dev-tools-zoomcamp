@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: coding-interview-platform
+    env: docker
+    plan: free
+    dockerContext: ./02-end-to-end/homework
+    dockerfilePath: ./02-end-to-end/homework/Dockerfile
+    autoDeploy: true
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
