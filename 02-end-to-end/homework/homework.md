@@ -42,6 +42,87 @@ What's the initial prompt you gave to AI to start the implementation?
 
 Copy and paste it in the homework form.
 
+```text
+Implement an end-to-end online coding interview platform with real-time collaborative editing, shareable room links, syntax highlighting, and safe in-browser code execution**.
+
+### Tech constraints (use exactly these)
+
+* Monorepo with:
+
+  * `frontend/`: React + Vite + TypeScript
+  * `backend/`: Node.js + Express + TypeScript
+* Real-time: use Socket.IO (server + client)
+* Code editor: use Monaco Editor (syntax highlighting)
+* Safe execution in the browser:
+
+  * Implement JavaScript execution via a Web Worker sandbox
+  * Time-limit execution (e.g., 2s), capture `console.log`, and prevent access to DOM APIs
+  * Return stdout + errors back to UI
+  * (Do not execute code on the server)
+
+### Functional requirements
+
+1. A user can click “Create interview” and get a shareable link like `/r/<roomId>`.
+2. Anyone opening the link joins the same room and can:
+
+   * edit code in the editor collaboratively
+   * see live updates in real-time
+3. Provide a language selector (at least `javascript`, `python`, `typescript`) that changes editor highlighting.
+
+   * Execution is required only for JavaScript (others can show “coming soon”).
+4. Add a “Run” button:
+
+   * Runs code in the Web Worker
+   * Shows output panel with captured logs and error messages
+5. Keep it simple but working.
+
+### Architecture details
+
+* Backend:
+
+  * `POST /api/rooms` creates a room id and returns it
+  * Socket.IO handles:
+
+    * `join-room` (roomId)
+    * `code-update` (roomId, code)
+    * `language-update` (roomId, language)
+  * Maintain room state in memory (no DB).
+  * CORS configured for Vite dev server.
+* Frontend:
+
+  * Landing page: “Create interview” button.
+  * Room page:
+
+    * Monaco editor + language selector
+    * output panel + Run button
+    * Connect to Socket.IO and synchronize state
+  * Debounce edits to avoid flooding.
+
+### Dev experience (must work in Codespaces)
+
+* Provide `package.json` scripts in root and each app.
+* Add a "root README" with exact commands to run locally:
+
+  * `npm install`
+  * `npm run dev` (runs both frontend+backend concurrently)
+* Include a root `docker-compose.yml` (optional, but preferred) to run both services.
+
+### Deliverables
+
+* Create all files and folders.
+* Write the code, configs, and minimal styling.
+* Make sure it runs without manual patching.
+* At the end, summarize:
+
+  * how to start it
+  * what URLs to open
+  * how to test collaboration (two tabs)
+  * how safe execution works
+
+Proceed to generate the full implementation now inside the folder 
+
+02-end-to-end/homework/
+```
 
 ## Question 2: Integration Tests
 
