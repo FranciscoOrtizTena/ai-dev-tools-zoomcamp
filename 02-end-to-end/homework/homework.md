@@ -146,6 +146,10 @@ Now let's make it possible to run both client and server at the same time. Use `
 
 What's the command you have in `package.json` for `npm dev` for running both?
 
+```bash
+concurrently \"npm --prefix backend run dev\" \"npm --prefix frontend run dev\"
+```
+
 
 ## Question 4: Syntax Highlighting
 
@@ -153,7 +157,9 @@ Let's now add support for syntax highlighting for JavaScript and Python.
 
 Which library did AI use for it?
 
-
+```text
+Monaco Editor
+```
 
 ## Question 5: Code Execution
 
