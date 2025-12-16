@@ -38,10 +38,10 @@ self.onmessage = async (event: MessageEvent<WorkerRequest>) => {
   }
 };
 
+type AsyncFunctionConstructor = new (...args: string[]) => (...args: unknown[]) => Promise<unknown>;
+
 const runJavaScript = async (code: string, safeConsole: { log: (...args: unknown[]) => void }) => {
-  const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor as (
-    ...args: string[]
-  ) => (...args: unknown[]) => Promise<unknown>;
+  const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor as AsyncFunctionConstructor;
   const runner = new AsyncFunction("console", code);
   await runner(safeConsole);
 };
