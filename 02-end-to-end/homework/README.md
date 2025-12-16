@@ -28,6 +28,12 @@ Open two browser tabs with the same `/r/<roomId>` URL to see live code and langu
 - Headless is the default; runs fine in Codespaces.
 - If you see "No tests found", update to the latest code and ensure config resolves to `tests/`.
 
+## Docker (single container)
+
+- Build: `docker build -t coding-interview-app .`
+- Run: `docker run --rm -p 8080:8080 coding-interview-app`
+- Open port 8080 in Codespaces; both API and frontend are served from http://localhost:8080
+
 ## Docker Compose (optional)
 
 ```

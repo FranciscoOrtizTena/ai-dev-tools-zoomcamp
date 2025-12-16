@@ -13,6 +13,7 @@ type RoomState = {
 const app = express();
 const PORT = process.env.PORT ? Number(process.env.PORT) : 4000;
 const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN ?? "http://localhost:5173";
+const distPath = path.join(__dirname, "../../frontend/dist");
 
 app.use(
   cors({
@@ -78,6 +79,11 @@ app.post("/api/rooms", (_req, res) => {
     rooms.set(roomId, { ...defaultState });
   }
   res.json({ roomId });
+});
+
+app.use(express.static(distPath));
+app.get("*", (_req, res) => {
+  res.sendFile(path.join(distPath, "index.html"));
 });
 
 const server = http.createServer(app);
