@@ -1,6 +1,6 @@
 # Collaborative Coding Interview Platform
 
-Real-time coding interview workspace with shareable rooms, Monaco editor, Socket.IO collaboration, and in-browser sandboxed execution for JavaScript.
+Real-time coding interview workspace with shareable rooms, Monaco editor, Socket.IO collaboration, and in-browser sandboxed execution for JavaScript and Python (Pyodide).
 
 ## Quick start (Codespaces/local)
 
@@ -13,8 +13,9 @@ Real-time coding interview workspace with shareable rooms, Monaco editor, Socket
 
 - Click **Create interview** to get a room link like `/r/<roomId>`.
 - Share the URL; everyone joining sees the same code and language in real time.
-- Switch syntax highlighting between JavaScript, TypeScript, and Python (execution only for JS).
-- Press **Run** to execute JavaScript safely inside a Web Worker (2s timeout, console logs captured).
+- Switch syntax highlighting between JavaScript, TypeScript, and Python (Run supports JS and Python; TypeScript coming soon).
+- Press **Run** to execute code safely inside a Web Worker (2s timeout, console logs captured). Python runs via Pyodide loaded inside the worker.
+  - Backend docs page: http://localhost:4000/docs
 
 ### Collaboration tip
 
@@ -31,6 +32,6 @@ Backend: http://localhost:4000
 
 ## Project structure
 
-- `backend/`: Express + Socket.IO, in-memory room state, `POST /api/rooms`
+- `backend/`: Express + Socket.IO, in-memory room state, `POST /api/rooms`, `/docs`, OpenAPI spec at `/openapi.yaml`
 - `frontend/`: React + Vite + Monaco editor + Web Worker sandbox
 - `docker-compose.yml`: runs frontend and backend together

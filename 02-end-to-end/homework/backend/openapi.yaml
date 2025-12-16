@@ -1,0 +1,63 @@
+openapi: 3.1.0
+info:
+  title: Collaborative Coding Interview API
+  version: 1.0.0
+  description: API + realtime events for the coding interview platform.
+servers:
+  - url: http://localhost:4000
+paths:
+  /api/rooms:
+    post:
+      summary: Create a new room id
+      responses:
+        "200":
+          description: Room created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  roomId:
+                    type: string
+                    example: abcd1234
+              examples:
+                sample:
+                  value:
+                    roomId: abcd1234
+        "500":
+          description: Server error
+components:
+  schemas:
+    RoomState:
+      type: object
+      properties:
+        code:
+          type: string
+        language:
+          type: string
+          enum: [javascript, typescript, python]
+  x-socketio:
+    url: /socket.io
+    events:
+      join-room:
+        payload:
+          type: object
+          properties:
+            roomId:
+              type: string
+      code-update:
+        payload:
+          type: object
+          properties:
+            roomId:
+              type: string
+            code:
+              type: string
+      language-update:
+        payload:
+          type: object
+          properties:
+            roomId:
+              type: string
+            language:
+              type: string

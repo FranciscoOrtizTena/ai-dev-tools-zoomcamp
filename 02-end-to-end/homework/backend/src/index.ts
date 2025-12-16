@@ -3,6 +3,7 @@ import express from "express";
 import http from "http";
 import { randomUUID } from "crypto";
 import { Server } from "socket.io";
+import path from "path";
 
 type RoomState = {
   code: string;
@@ -15,7 +16,11 @@ const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN ?? "http://localhost:5173";
 
 app.use(
   cors({
-    origin: CLIENT_ORIGIN,
+    // Allow dev origins (localhost, Codespaces, etc.). For prod, pin this down.
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+      return callback(null, true);
+    },
   })
 );
 app.use(express.json());
@@ -23,9 +28,45 @@ app.use(express.json());
 const rooms = new Map<string, RoomState>();
 
 const defaultState: RoomState = {
-  code: "// Start coding together\n",
+  code: "",
   language: "javascript",
 };
+
+app.get("/", (_req, res) => {
+  res.redirect("/docs");
+});
+
+app.get("/docs", (_req, res) => {
+  res.type("html").send(`
+    <!doctype html>
+    <html>
+      <head>
+        <title>API docs</title>
+        <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5/swagger-ui.css" />
+        <style>
+          body { margin: 0; }
+          #swagger { margin: 0 auto; }
+        </style>
+      </head>
+      <body>
+        <div id="swagger"></div>
+        <script src="https://unpkg.com/swagger-ui-dist@5/swagger-ui-bundle.js"></script>
+        <script>
+          window.onload = () => {
+            window.ui = SwaggerUIBundle({
+              url: '/openapi.yaml',
+              dom_id: '#swagger'
+            });
+          };
+        </script>
+      </body>
+    </html>
+  `);
+});
+
+app.get("/openapi.yaml", (_req, res) => {
+  res.sendFile(path.join(__dirname, "../openapi.yaml"));
+});
 
 app.post("/api/rooms", (_req, res) => {
   const roomId = randomUUID().slice(0, 8);
@@ -37,7 +78,12 @@ app.post("/api/rooms", (_req, res) => {
 
 const server = http.createServer(app);
 const io = new Server(server, {
-  cors: { origin: CLIENT_ORIGIN },
+  cors: {
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+      return callback(null, true);
+    },
+  },
 });
 
 io.on("connection", (socket) => {

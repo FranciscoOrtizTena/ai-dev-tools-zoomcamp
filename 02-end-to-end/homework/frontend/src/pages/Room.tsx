@@ -9,13 +9,20 @@ type ExecutionOutput = {
   error?: string;
 };
 
-const SOCKET_URL = import.meta.env.VITE_SOCKET_URL ?? "http://localhost:4000";
+const SOCKET_URL = import.meta.env.VITE_SOCKET_URL ?? "";
+const PYODIDE_BASE = import.meta.env.VITE_PYODIDE_URL ?? "https://cdn.jsdelivr.net/pyodide/v0.25.1/full/";
 
 const languages = [
   { value: "javascript", label: "JavaScript" },
   { value: "typescript", label: "TypeScript" },
   { value: "python", label: "Python" },
 ];
+
+const defaultSnippets: Record<string, string> = {
+  javascript: "// Start coding together\nconsole.log('Hello!');\n",
+  typescript: "// Start coding together\nconst msg: string = 'Hello!';\nconsole.log(msg);\n",
+  python: "# Start coding together\nprint('Hello!')\n",
+};
 
 function Room() {
   const { roomId } = useParams();
@@ -29,7 +36,7 @@ function Room() {
 
   useEffect(() => {
     if (!roomId) return;
-    const socket = io(SOCKET_URL, { transports: ["websocket"] });
+    const socket = io(SOCKET_URL || undefined, { transports: ["websocket"] });
     socketRef.current = socket;
 
     socket.on("connect", () => {
@@ -40,8 +47,9 @@ function Room() {
     socket.on("disconnect", () => setConnected(false));
 
     socket.on("room-state", (state: { code: string; language: string }) => {
-      setCode(state.code);
       setLanguage(state.language);
+      const incoming = state.code ?? "";
+      setCode(incoming === "" ? defaultSnippets[state.language] ?? "" : incoming);
     });
 
     socket.on("code-update", (newCode: string) => {
@@ -49,7 +57,12 @@ function Room() {
     });
 
     socket.on("language-update", (newLanguage: string) => {
-      setLanguage(newLanguage);
+      setLanguage(() => newLanguage);
+      setCode((current) => {
+        const placeholders = Object.values(defaultSnippets);
+        const shouldReplace = current.trim() === "" || placeholders.includes(current);
+        return shouldReplace ? defaultSnippets[newLanguage] ?? current : current;
+      });
     });
 
     return () => {
@@ -76,22 +89,32 @@ function Room() {
   const handleLanguageChange = (event: ChangeEvent<HTMLSelectElement>) => {
     const next = event.target.value;
     setLanguage(next);
+
+    setCode((current) => {
+      const placeholders = Object.values(defaultSnippets);
+      const shouldReplace = current.trim() === "" || placeholders.includes(current);
+      const nextSnippet = defaultSnippets[next] ?? current;
+      if (shouldReplace && nextSnippet !== current) {
+        broadcastCode(nextSnippet);
+        return nextSnippet;
+      }
+      return current;
+    });
+
     if (socketRef.current && roomId) {
       socketRef.current.emit("language-update", { roomId, language: next });
     }
   };
 
   const runCode = () => {
-    if (language !== "javascript") {
+    if (language === "typescript") {
       setOutput({
         logs: [],
-        error: "Execution only available for JavaScript. Other languages coming soon.",
+        error: "Execution for TypeScript not yet available. Try JavaScript or Python.",
       });
       return;
     }
-    const worker = new Worker(new URL("../workers/executor.ts", import.meta.url), {
-      type: "module",
-    });
+    const worker = new Worker(new URL("../workers/executor.ts", import.meta.url));
     let finished = false;
     const timeout = window.setTimeout(() => {
       if (!finished) {
@@ -107,14 +130,17 @@ function Room() {
       worker.terminate();
     };
 
-    worker.onerror = () => {
+    worker.onerror = (event) => {
       finished = true;
       window.clearTimeout(timeout);
-      setOutput({ logs: [], error: "Execution failed inside sandbox." });
+      setOutput({
+        logs: [],
+        error: event.message || "Execution failed inside sandbox.",
+      });
       worker.terminate();
     };
 
-    worker.postMessage({ code });
+    worker.postMessage({ code, language, pyodideBase: PYODIDE_BASE });
   };
 
   const leaveRoom = () => navigate("/");

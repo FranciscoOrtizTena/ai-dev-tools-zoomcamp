@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:4000";
+const API_URL = import.meta.env.VITE_API_URL ?? "";
 
 function Landing() {
   const navigate = useNavigate();
@@ -12,7 +12,8 @@ function Landing() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`${API_URL}/api/rooms`, {
+      const base = API_URL || "";
+      const res = await fetch(`${base}/api/rooms`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
       });
