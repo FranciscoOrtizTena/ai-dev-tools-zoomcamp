@@ -194,7 +194,7 @@ function Room() {
             ))}
           </select>
           <div className="spacer" />
-          <button className="btn" onClick={runCode}>
+          <button className="btn" data-testid="run-btn" onClick={runCode}>
             Run
           </button>
         </div>
@@ -217,6 +217,7 @@ function Room() {
             Output
           </p>
           <div
+            data-testid="output-panel"
             style={{
               background: "#0b1220",
               border: "1px solid #1e293b",

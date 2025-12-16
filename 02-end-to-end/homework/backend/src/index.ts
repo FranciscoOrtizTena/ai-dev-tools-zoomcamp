@@ -36,6 +36,10 @@ app.get("/", (_req, res) => {
   res.redirect("/docs");
 });
 
+app.get("/api/health", (_req, res) => {
+  res.json({ ok: true });
+});
+
 app.get("/docs", (_req, res) => {
   res.type("html").send(`
     <!doctype html>

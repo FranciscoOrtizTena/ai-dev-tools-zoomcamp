@@ -136,7 +136,9 @@ Also it's a good idea to ask it to start creating a `README.md` file with all th
 
 What's the terminal command you use for executing tests?
 
-
+```bash
+npm run test
+```
 
 ## Question 3: Running Both Client and Server
 

@@ -37,7 +37,7 @@ function Landing() {
           Spin up a collaborative room, share the link, and pair on code with
           real-time updates.
         </p>
-        <button className="btn" onClick={createRoom} disabled={loading}>
+        <button className="btn" data-testid="create-btn" onClick={createRoom} disabled={loading}>
           {loading ? "Creating..." : "Create interview"}
         </button>
         {error && <p style={{ color: "#f97316" }}>{error}</p>}

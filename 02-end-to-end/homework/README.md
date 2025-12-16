@@ -21,6 +21,13 @@ Real-time coding interview workspace with shareable rooms, Monaco editor, Socket
 
 Open two browser tabs with the same `/r/<roomId>` URL to see live code and language syncing via Socket.IO.
 
+### Tests (Playwright)
+
+- One-time: `npx playwright install --with-deps chromium`
+- Run integration tests: `npm test` (starts frontend+backend, then Playwright headless)
+- Headless is the default; runs fine in Codespaces.
+- If you see "No tests found", update to the latest code and ensure config resolves to `tests/`.
+
 ## Docker Compose (optional)
 
 ```
