@@ -180,6 +180,10 @@ Now let's containerize our application. Ask AI to help you create a Dockerfile f
 
 What's the base image you used for your Dockerfile?
 
+```text
+node:20-alpine
+```
+
 
 ## Question 7: Deployment
 
